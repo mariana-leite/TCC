@@ -1,0 +1,47 @@
+package com.java.socket;
+
+public class SmartLamp {
+	
+	
+	private int luminosity;
+	private String status;
+	
+	
+	public SmartLamp(int luminosity, String status) {
+		this.luminosity = luminosity;
+		this.status = status;
+	}
+	
+	
+	public SmartLamp() {
+		
+	}
+
+
+	public int getLuminosity() {
+		return luminosity;
+	}
+
+
+	public void setLuminosity(int luminosity) {
+		this.luminosity = luminosity;
+	}
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return "SmartLamp { /n /t Luminosity: " + luminosity + " /n /t Status: " + status + "/n }";
+	}
+
+
+}

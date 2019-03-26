@@ -1,0 +1,107 @@
+package com.java.socket;
+
+public class SmartLamp {
+	
+	private String id;
+	private String typeObject = "Room";
+	private Luminosity luminosity;
+	private State state;
+	
+	
+	public SmartLamp(String id, Luminosity luminosity, State state) {
+		this.id = id;
+		this.luminosity = luminosity;
+		this.state = state;
+	}
+	
+	
+	public SmartLamp() {
+		
+	}
+	
+	public class Luminosity {
+		private String type = "Integer";
+		private int value; 
+		
+		public Luminosity () {
+			
+		}
+		
+		public Luminosity(int value) {
+			this.value = value;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public int getValue() {
+			return value;
+		}
+
+		public void setValue(int value) {
+			this.value = value;
+		}
+		
+		
+	}
+	
+	public class State {
+		private String type = "Text";
+		private String value;
+		
+		public State() {
+			
+		}
+		
+		public State(String value) {
+			this.value = value;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+		
+		
+	}
+
+	public String getId() {
+		return id;
+	}
+
+
+	public String getTypeObject() {
+		return typeObject;
+	}
+
+
+	public Luminosity getLuminosity() {
+		return luminosity;
+	}
+
+
+	public void setLuminosity(Luminosity luminosity) {
+		this.luminosity = luminosity;
+	}
+
+
+	public State getStatus() {
+		return state;
+	}
+
+
+	public void setStatus(State status) {
+		this.state = status;
+	}
+	
+	
+
+}

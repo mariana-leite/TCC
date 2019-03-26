@@ -1,0 +1,34 @@
+package com.java.socket;
+
+public class CreateEntity {
+	
+	/*
+	 * 
+    {
+  "id": "Square01",
+  "type": "Square",
+  "name": {
+    "value": "Praça Oliveira Belo",
+    "type": "Text"
+  },
+  "location": {
+    "value": "-10.936273, -37.061228",
+    "type": "geo:point"
+  },
+  "radius": {
+    "value": 45,
+    "type": "Float"
+  }
+}
+	 */
+	
+	private String id;
+	private String type;
+	
+	
+	public static class Attrs{
+		
+	}
+	
+
+}

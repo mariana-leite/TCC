@@ -1,0 +1,45 @@
+package com.java.socket;
+
+public class Subscription {
+	
+	String msg = "{\n" + 
+			"  \"description\": \"A subscription to get info about Room1\",\n" + 
+			"  \"subject\": {\n" + 
+			"    \"entities\": [\n" + 
+			"      {\n" + 
+			"        \"id\": \"Room1\",\n" + 
+			"        \"type\": \"Room\"\n" + 
+			"      }\n" + 
+			"    ],\n" + 
+			"    \"condition\": {\n" + 
+			"      \"attrs\": [\n" + 
+			"        \"pressure\"\n" + 
+			"      ]\n" + 
+			"    }\n" + 
+			"  },\n" + 
+			"  \"notification\": {\n" + 
+			"    \"http\": {\n" + 
+			"      \"url\": \"http://172.18.1.1:"+ "PPPOOOOORRRTTTT" +"/\"\n" + 
+			"    },\n" + 
+			"    \"attrs\": [\n" + 
+			"      \"temperature\"\n" + 
+			"    ]\n" + 
+			"  },\n" + 
+			"  \"expires\": \"2040-01-01T14:00:00.00Z\",\n" + 
+			"  \"throttling\": 5\n" + 
+			"}";
+	
+	private String descriptionName = "description";
+	private String description;
+	
+	
+	
+	public class Subject{
+		
+		private String name = "subject";
+		
+	}
+	
+	
+
+}

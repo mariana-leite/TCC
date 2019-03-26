@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.java.socket.SmartLamp.Luminosity"/>
+<fullyQualifiedTypeName name="com.java.socket.SmartLamp.State"/>
+<fullyQualifiedTypeName name="org.json.simple.JSONObject"/>
+<fullyQualifiedTypeName name="java.util.Date"/>
+<fullyQualifiedTypeName name="com.java.socket.ServiceGroup.Services"/>
+<fullyQualifiedTypeName name="java.io.DataOutputStream"/>
+<fullyQualifiedTypeName name="com.java.socket.CreateDevice.Commands"/>
+<fullyQualifiedTypeName name="com.java.socket.CreateDevice.StaticAttributes"/>
+<fullyQualifiedTypeName name="com.java.socket.CreateDevice.Devices"/>
+<fullyQualifiedTypeName name="com.java.socket.Square.Attrs"/>
+<fullyQualifiedTypeName name="com.java.socket.Subscription.EntitiesIdPattern"/>
+<fullyQualifiedTypeName name="com.java.socket.UltraLight.AttrsUltraLight"/>
+<fullyQualifiedTypeName name="com.java.socket.UltraLight"/>
+<fullyQualifiedTypeName name="com.java.socket.NotificationResponse"/>
+<fullyQualifiedTypeName name="com.java.socket.NotificationResponse.Data"/>
+<fullyQualifiedTypeName name="java.lang.reflect.Array"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="com.java.socket.ResponseFromGET"/>
+<fullyQualifiedTypeName name="java.io.OutputStreamWriter"/>
+<fullyQualifiedTypeName name="com.java.socket.CreateDevice.Attributes"/>
+<fullyQualifiedTypeName name="com.java.socket.Subscription.Expression"/>
+<fullyQualifiedTypeName name="com.google.gson.GsonBuilder"/>
+<fullyQualifiedTypeName name="com.google.gson.annotations.SerializedName"/>
+<fullyQualifiedTypeName name="com.java.createdevice.CreateDevice.Command"/>
+<fullyQualifiedTypeName name="com.java.registration.Provider"/>
+<fullyQualifiedTypeName name="com.java.registration.HttpProvider"/>
+<fullyQualifiedTypeName name="com.java.registration.DataProvided"/>
+<fullyQualifiedTypeName name="com.java.registration.Registration"/>
+<fullyQualifiedTypeName name="com.java.registration.EntitieProvider"/>
+<fullyQualifiedTypeName name="com.java.ultralight.UltraLightCommand"/>
+<fullyQualifiedTypeName name="com.java.sendcommand.SendCommand"/>
+<fullyQualifiedTypeName name="com.java.sendcommand.Command2"/>
+<fullyQualifiedTypeName name="com.java.update.AttributeUpdateInteger"/>
+<fullyQualifiedTypeName name="com.java.update.AttributeUpdate"/>
+</qualifiedTypeNameHistroy>

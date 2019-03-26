@@ -1,0 +1,24 @@
+package com.java.socket;
+
+public class ResponseFromGET {
+/*
+ * [{"id":"SmartLamp02","type":"Lamp","TimeInstant":"2019-02-12T16:13:07.00Z","location":"-10.891191,-37.214734","luminosity":"2","off_info":" ","off_status":"UNKNOWN",
+				"on_info":" ","on_status":"UNKNOWN","state":"off","on":"","off":""},
+{"id":"SmartLamp01","type":"Lamp","on":"","off":""},
+{"id":"SmartLamp03","type":"Lamp","on":"","off":""}]
+ */
+	private String id;
+	private String type;
+	private String timeinstant;
+	private String location;
+	private String luminosity;
+	private String off_info;
+	private String off_status;
+	private String on_info;
+	private String on_status;
+	private String state;
+	private String on;
+	private String off;
+	
+	
+}

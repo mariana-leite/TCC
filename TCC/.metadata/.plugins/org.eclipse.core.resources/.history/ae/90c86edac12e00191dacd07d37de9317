@@ -1,0 +1,46 @@
+package com.java.socket;
+
+public class UltraLight {
+	
+	private Attrs[] attrs;
+	
+	public static class Attrs{
+		private String name;
+		private String value;
+		
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getValue() {
+			return value;
+		}
+		public void setValue(String value) {
+			this.value = value;
+		}	
+	}
+	
+	public String toString(Attrs[] attrs) {
+		String msg = "'";
+		int i = 0;
+		for(i = 0; i < attrs.length-1; i++) {
+			msg = msg + attrs[i] + "|";
+		}
+		i++;
+		msg = msg + attrs[i]+"'";
+		return null;
+	}
+
+	public Attrs[] getAttrs() {
+		return attrs;
+	}
+
+	public void setAttrs(Attrs[] attrs) {
+		this.attrs = attrs;
+	}
+	
+	
+
+}

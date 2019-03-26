@@ -1,0 +1,422 @@
+package com.java.socket;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.java.socket.CreateDevice.Attributes;
+import com.java.socket.CreateDevice.Commands;
+import com.java.socket.CreateDevice.Devices;
+import com.java.socket.CreateDevice.StaticAttributes;
+import com.java.socket.NotificationResponse.Data;
+import com.java.socket.ServiceGroup.Services;
+import com.java.socket.SmartLamp.Luminosity;
+import com.java.socket.SmartLamp.State;
+import com.java.socket.Square.Attrs;
+import com.java.socket.Subscription.Condition;
+import com.java.socket.Subscription.Entities;
+import com.java.socket.Subscription.EntitiesIdPattern;
+import com.java.socket.Subscription.Http;
+import com.java.socket.Subscription.Notification;
+import com.java.socket.UltraLight.AttrsUltraLight;
+
+
+
+public class MyServerSocket {
+
+	private ServerSocket server;
+	//private static HttpURLConnection con;
+    
+    public MyServerSocket() throws Exception {
+        this.server = new ServerSocket(0, 1, InetAddress.getByName("172.18.1.1"));
+    }
+    
+    private String listen() throws Exception {
+        String data = null;
+        String data2 = null;
+        Socket client = this.server.accept();
+        //String clientAddress = client.getInetAddress().getHostAddress();
+       // System.out.println("\r\nNew connection from " + clientAddress);
+        
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(client.getInputStream()));        
+        while ( (data = in.readLine()) != null ) {
+        	data2 = data;
+            //System.out.println("\r\nMessage from " + clientAddress + ": " + data);
+        }
+        return data2;
+    }
+    
+    public static void POSTRequest(int port, String msg, URL url, String content_type) throws IOException {
+    	
+    	//URL url = new URL("http://localhost:1026/v2/subscriptions"); 
+    	//POST /v2/subscriptions?options=skipInitialNotification
+    	
+    	URLConnection con = url.openConnection();
+    	/*HttpURLConnection http = (HttpURLConnection)con;
+    	http.setRequestMethod("POST"); // PUT is another valid option
+    	http.setDoOutput(true);
+        
+        byte[] out = msg.getBytes(StandardCharsets.UTF_8);
+        int length = out.length;
+        
+        http.setFixedLengthStreamingMode(length);
+        http.setRequestProperty("Content-Type", "application/json;");
+        http.setRequestProperty("fiware-service", "openiot");
+        http.setRequestProperty("fiware-servicepath", "/");
+        http.connect();
+        try(OutputStream os = http.getOutputStream()) {	
+            os.write(out);
+        }*/
+    	
+        byte[] postData = msg.getBytes(StandardCharsets.UTF_8);
+
+        try {
+
+            con = (HttpURLConnection) url.openConnection();
+
+            con.setDoOutput(true);
+            ((HttpURLConnection) con).setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", "Java client");
+            con.setRequestProperty("Content-Type", content_type);
+            con.setRequestProperty("fiware-service", "openiot");
+            con.setRequestProperty("fiware-servicepath", "/");
+
+            try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+                wr.write(postData);
+            }
+
+            StringBuilder content;
+
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()))) {
+
+                String line;
+                content = new StringBuilder();
+
+                while ((line = in.readLine()) != null) {
+                    content.append(line);
+                    content.append(System.lineSeparator());
+                }
+            }
+
+           // System.out.println(content.toString());
+
+        } finally {
+            
+            ((HttpURLConnection) con).disconnect();
+        }
+    }
+    
+    
+    private static String sendGET(String coords) throws IOException {
+		URL url = new URL("http://localhost:1026/v2/entities?type=Lamp&georel=near;maxDistance:37&geometry=point&coords="+coords+"&options=keyValues");
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		
+		con.setRequestMethod("GET");
+		con.setRequestProperty("User-Agent", "Java client");
+		con.setRequestProperty("fiware-service", "openiot");
+        con.setRequestProperty("fiware-servicepath", "/");
+		int responseCode = con.getResponseCode();
+		//System.out.println("GET Response Code :: " + responseCode);
+		if (responseCode == HttpURLConnection.HTTP_OK) { // success
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			// print result
+			System.out.println(response.toString());
+			return response.toString();
+		} else {
+			System.out.println("GET request not worked");
+			return null;
+		}
+
+	}
+
+   
+    
+    public InetAddress getSocketAddress() {
+        return this.server.getInetAddress();
+    }
+    
+    public int getPort() {
+        return this.server.getLocalPort();
+    }
+    
+    public static void main(String[] args) throws Exception {
+
+    	MyServerSocket app = new MyServerSocket();
+       /* System.out.println("\r\nRunning Server: " + 
+                "Host=" + app.getSocketAddress().getHostAddress() + 
+                " Port=" + app.getPort());*/
+        
+        //Service Group
+        Services[] services = {new Services("4jggokgpepnvsb2uv4s40d59ov","http://orion:1026","Thing","/iot/d")};
+        ServiceGroup servicegroup = new ServiceGroup(services);
+        
+        Gson gsonServiceGroup = new Gson();
+        String jsonServiceGroup = gsonServiceGroup.toJson(servicegroup);
+        //System.out.println(jsonServiceGroup);
+        
+        URL urlServiceGroup = new URL("http://localhost:4041/iot/services");
+        MyServerSocket.POSTRequest(app.getPort(),jsonServiceGroup,urlServiceGroup,"application/json");
+        
+        
+        
+        //Square
+        Attrs name = new Attrs("Praça Oliveira Belo","Text");
+        Attrs location = new Attrs("-10.936273,-37.061228","geo:point");
+        Attrs radius = new Attrs("45","Float");
+        Square square01 = new Square("Square01","Square",name,location,radius);
+        Gson gsonSquare = new Gson();
+        String jsonSquare = gsonSquare.toJson(square01);
+        //System.out.println(jsonSquare);
+        URL urlSquare = new URL("http://localhost:1026/v2/entities");
+        MyServerSocket.POSTRequest(app.getPort(),jsonSquare,urlSquare,"application/json");
+        
+        
+        
+        //Create Device
+        Commands[] commands = {new Commands("on"),new Commands("off")};
+        Attributes[] attributes = {new Attributes("s","state","Text"), new Attributes("l","luminosity","Integer"),new Attributes("lo","location","geo:point")};
+        StaticAttributes[] static_attributes = {new StaticAttributes("refSquare", "Relationship", "Square01")};
+        
+        /*Devices[] device1 = {new Devices("lamp01","SmartLamp01","Lamp","PDI-IoTA-UltraLight","HTTP","http://iot-sensors:3001/iot/lamp01",
+        					commands,attributes,static_attributes)};*/
+        Devices[] device1 = {new Devices("lamp01","SmartLamp01","Lamp","PDI-IoTA-UltraLight","HTTP","http://iot-sensors:3001/iot/lamp01",
+				commands,attributes)};
+        CreateDevice createDevice1 = new CreateDevice(device1);
+        Gson gsonDevice1 = new Gson();
+        String jsonDevice1 = gsonDevice1.toJson(createDevice1);
+        //System.out.println(jsonDevice1);
+        URL urlLamp = new URL("http://localhost:4041/iot/devices");
+        MyServerSocket.POSTRequest(app.getPort(),jsonDevice1,urlLamp,"application/json");
+        
+        /*Devices[] device2 = {new Devices("lamp02","SmartLamp02","Lamp","PDI-IoTA-UltraLight","HTTP","http://iot-sensors:3001/iot/lamp02",
+        		commands,attributes,static_attributes)};*/
+        Devices[] device2 = {new Devices("lamp02","SmartLamp02","Lamp","PDI-IoTA-UltraLight","HTTP","http://iot-sensors:3001/iot/lamp02",
+        		commands,attributes)};
+        CreateDevice createDevice2 = new CreateDevice(device2);
+        Gson gsonDevice2 = new Gson();
+        String jsonDevice2 = gsonDevice2.toJson(createDevice2);
+        //System.out.println(jsonDevice);
+        MyServerSocket.POSTRequest(app.getPort(),jsonDevice2,urlLamp,"application/json");
+        
+        /*Devices[] device3 = {new Devices("lamp03","SmartLamp03","Lamp","PDI-IoTA-UltraLight","HTTP","http://iot-sensors:3001/iot/lamp03",
+        		commands,attributes,static_attributes)};*/
+        Devices[] device3 = {new Devices("lamp03","SmartLamp03","Lamp","PDI-IoTA-UltraLight","HTTP","http://iot-sensors:3001/iot/lamp03",
+        		commands,attributes)};
+        CreateDevice createDevice3 = new CreateDevice(device3);
+        Gson gsonDevice3 = new Gson();
+        String jsonDevice3 = gsonDevice3.toJson(createDevice3);
+        //System.out.println(jsonDevice);
+        MyServerSocket.POSTRequest(app.getPort(),jsonDevice3,urlLamp,"application/json");
+        
+        
+        
+        //Subscription
+        //Entities[] entities = {new Entities("SmartLamp01","Lamp")};
+        EntitiesIdPattern[] entitiesIdPattern = {new EntitiesIdPattern(".*", "Lamp")};
+    	/*LocalDateTime data = LocalDateTime.now().plusYears(40);
+    	String data1 = "2059-02-11T18:56:00.000Z";
+    	Subscription subscription = new Subscription("TESTE", entities, new Condition(new String[] {"luminosity"}),
+    												new Notification(new Http("http://172.18.1.1:"+ app.getPort()),
+    												new String[] {"state"}) ,
+    												data1,5);*/
+    	Subscription subscription = new Subscription("TESTE", entitiesIdPattern, new Condition(new String[] {"state"}),
+				new Notification(new Http("http://172.18.1.1:"+ app.getPort()),
+				new String[] {"state","location"}) , 0);   
+    	//ObjectMapper mapper = new ObjectMapper();
+    	//String json = mapper.writeValueAsString(subscription);
+    	//System.out.println(json);
+    	
+    	Gson gson = new Gson();
+        String json = gson.toJson(subscription);
+        //System.out.println(json);
+        URL urlSubscription = new URL("http://localhost:1026/v2/subscriptions");
+        
+        MyServerSocket.POSTRequest(app.getPort(),json,urlSubscription,"application/json");
+        
+        
+        
+        AttrsUltraLight attr1 = new AttrsUltraLight("l","2");
+    	AttrsUltraLight attr2 = new AttrsUltraLight("s","off");
+    	AttrsUltraLight attr3 = new AttrsUltraLight("lo","-10.900296,-37.072466");
+    	UltraLight[] ultralight = {new UltraLight(attr1), new UltraLight(attr2), new UltraLight(attr3)};
+    	URL urlUpdate = new URL("http://localhost:7896/iot/d?k=4jggokgpepnvsb2uv4s40d59ov&i=lamp02");
+    	MyServerSocket.POSTRequest(app.getPort(),UltraLight.toStringMsg(ultralight),urlUpdate,"text/plain");
+    	
+    	
+    	attr1 = new AttrsUltraLight("l","2");
+    	attr2 = new AttrsUltraLight("s","on");
+    	attr3 = new AttrsUltraLight("lo","-10.891191,-37.214734");
+    	UltraLight[] ultralight2 = {new UltraLight(attr1), new UltraLight(attr2), new UltraLight(attr3)};
+    	urlUpdate = new URL("http://localhost:7896/iot/d?k=4jggokgpepnvsb2uv4s40d59ov&i=lamp01");
+    	MyServerSocket.POSTRequest(app.getPort(),UltraLight.toStringMsg(ultralight2),urlUpdate,"text/plain");
+    	
+    	
+    	attr1 = new AttrsUltraLight("l","2");
+    	attr2 = new AttrsUltraLight("s","on");
+    	attr3 = new AttrsUltraLight("lo","-10.936116, -37.061510");
+    	UltraLight[] ultralight3 = {new UltraLight(attr1), new UltraLight(attr2), new UltraLight(attr3)};
+    	urlUpdate = new URL("http://localhost:7896/iot/d?k=4jggokgpepnvsb2uv4s40d59ov&i=lamp03");
+    	MyServerSocket.POSTRequest(app.getPort(),UltraLight.toStringMsg(ultralight3),urlUpdate,"text/plain");
+    	
+    	
+    	NotificationResponse notification = new NotificationResponse();
+    	
+    	int j = 0;
+    	
+        while(j<3) {
+        	String response = app.listen();
+        	//System.out.println(response);
+        	Gson gsonResponse = new Gson();
+        	notification = gsonResponse.fromJson(response, NotificationResponse.class);
+        	for(Data notificationData : notification.getData()) {
+        		System.out.println(notificationData.getId() +" "+ notificationData.getState().getValue());
+        		if(notificationData.getState().getValue().equals("off")) {
+        			String responseGET = MyServerSocket.sendGET(notificationData.getLocation().getValue());
+        			//String[] obj2 = new String[5];
+        			int k = 0;
+        			while(responseGET.indexOf("{")>0) {
+        				int begin = responseGET.indexOf("{");
+        				int end = responseGET.indexOf("}");
+        				String teste = responseGET.substring(begin, end+1);
+        				System.out.println(teste);
+        				responseGET = responseGET.substring(end+1);
+        				System.out.println(responseGET);
+        				k++;
+        			}
+        			
+        			//List<ResponseFromGET> responseFromGET = new ArrayList<>();
+        			//Gson gsonResponseFromGET = new Gson();
+        			//responseFromGET = (List<ResponseFromGET>) gsonResponseFromGET.fromJson(responseGET, ResponseFromGET.class);
+        			System.out.println("AEEEEEE");
+        		}
+        	}
+        	j++;
+        	
+        	//System.out.println(j);
+        }
+        
+       // MyServerSocket.sendGET("-10.936273,-37.061228");
+        
+        
+    	
+    	
+    	//Entities
+    	/*SmartLamp lamp1 = new SmartLamp("Room1",new Luminosity(2),new State("On"));
+    	ObjectMapper mapper = new ObjectMapper();
+    	String json = mapper.writeValueAsString(lamp1);
+    	System.out.println(json);*/
+    }
+    
+    /* RASCUNHOS
+     * 
+     * -10.924971, -37.101606
+
+
+
+curl -iX POST \
+  'http://localhost:1026/v2/op/update' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "actionType":"APPEND",
+  "entities":[
+    {
+      "id":"urn:ngsi-ld:Square:001", "type":"Square",
+      "location":{
+        "type":"geo:json", "value":{ "type":"Point","coordinates":[-10.924971, -37.101606]}
+      },
+      "name":{
+        "type":"Text", "value":"UFS - Memorial da Democracia"
+      }
+    }
+  ]
+}'
+
+
+{
+  "id": "Square01",
+  "type": "Square",
+  "name": {
+    "value": "Praça Oliveira Belo",
+    "type": "Text"
+  },
+  "location": {
+    "value": "-10.936273, -37.061228",
+    "type": "geo:point"
+  },
+  "radius": {
+    "value": 45,
+    "type": "Float"
+  }
+}
+
+//longitude, latitude json
+//latitude, longitude simple location format e outros
+
+google maps [-10.936273, -37.061228]
+Praça Oliveira Belo
+raio = 45m
+
+
+curl -X GET \
+  'http://localhost:1026/v2/entities?georel=near;maxDistance:1000&geometry=point&coords=-37.061228,-10.936273' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /'
+  
+  
+georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5. Matching entities must be located (at most) 1000 meters from the reference point.
+{"subscriptionId":"5c62c795872e10d82d0d1bc4","data":[{"id":"SmartLamp02","type":"Lamp","state":{"type":"Text","value":"off",
+"metadata":{"TimeInstant":{"type":"ISO8601","value":"2019-02-12T13:18:13.716Z"}}}}]}
+
+curl -iX POST \
+  'http://localhost:7896/iot/d?k=4jggokgpepnvsb2uv4s40d59ov&i=lamp01' \
+  -H 'Content-Type: text/plain' \
+  -d 'l|1'
+  
+  curl -iX POST \
+  'http://localhost:7896/iot/d?k=4jggokgpepnvsb2uv4s40d59ov&i=lamp02' \
+  -H 'Content-Type: text/plain' \
+  -d 'l|2|s|off|lo|-10.891191,-37.214734'
+  
+  
+  
+  curl -X GET \
+  'http://localhost:1026/v2/entities?georel=near;maxDistance:10&geometry=point&coords=-10.891191,-37.214734&options=keyValues' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /'
+
+-10.900296,-37.072466
+-10.891191,-37.214734 
+
+[{"id":"SmartLamp02","type":"Lamp","TimeInstant":"2019-02-12T16:13:07.00Z","location":"-10.891191,-37.214734","luminosity":"2","off_info":" ","off_status":"UNKNOWN",
+				"on_info":" ","on_status":"UNKNOWN","state":"off","on":"","off":""},
+{"id":"SmartLamp01","type":"Lamp","on":"","off":""},
+{"id":"SmartLamp03","type":"Lamp","on":"","off":""}]
+
+
+     */
+}

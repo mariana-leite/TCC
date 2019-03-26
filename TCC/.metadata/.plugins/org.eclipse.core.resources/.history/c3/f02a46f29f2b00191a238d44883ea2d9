@@ -1,0 +1,175 @@
+package maven;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+
+
+
+public class MyServerSocket {
+
+	private ServerSocket server;
+	//private static HttpURLConnection con;
+    
+    public MyServerSocket() throws Exception {
+        this.server = new ServerSocket(0, 1, InetAddress.getByName("172.18.1.1"));
+    }
+    
+    private void listen() throws Exception {
+        String data = null;
+        Socket client = this.server.accept();
+        String clientAddress = client.getInetAddress().getHostAddress();
+        System.out.println("\r\nNew connection from " + clientAddress);
+        
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(client.getInputStream()));        
+        while ( (data = in.readLine()) != null ) {
+            System.out.println("\r\nMessage from " + clientAddress + ": " + data);
+        }
+    }
+    
+    public static void POSTRequest(int port) throws IOException {
+    	
+    	URL url = new URL("http://localhost:1026/v2/subscriptions");
+    	
+    	URLConnection con = url.openConnection();
+    	HttpURLConnection http = (HttpURLConnection)con;
+    	http.setRequestMethod("POST"); // PUT is another valid option
+    	http.setDoOutput(true);
+    	
+    	
+    	String msg = "{\n" + 
+    			"  \"description\": \"A subscription to get info about Room1\",\n" + 
+    			"  \"subject\": {\n" + 
+    			"    \"entities\": [\n" + 
+    			"      {\n" + 
+    			"        \"id\": \"Room1\",\n" + 
+    			"        \"type\": \"Room\"\n" + 
+    			"      }\n" + 
+    			"    ],\n" + 
+    			"    \"condition\": {\n" + 
+    			"      \"attrs\": [\n" + 
+    			"        \"pressure\"\n" + 
+    			"      ]\n" + 
+    			"    }\n" + 
+    			"  },\n" + 
+    			"  \"notification\": {\n" + 
+    			"    \"http\": {\n" + 
+    			"      \"url\": \"http://172.18.1.1:"+ port +"/\"\n" + 
+    			"    },\n" + 
+    			"    \"attrs\": [\n" + 
+    			"      \"temperature\"\n" + 
+    			"    ]\n" + 
+    			"  },\n" + 
+    			"  \"expires\": \"2040-01-01T14:00:00.00Z\",\n" + 
+    			"  \"throttling\": 5\n" + 
+    			"}";
+        
+        byte[] out = msg.getBytes(StandardCharsets.UTF_8);
+        int length = out.length;
+        
+        http.setFixedLengthStreamingMode(length);
+        http.setRequestProperty("Content-Type", "application/json;");
+        http.setRequestProperty("fiware-service", "openiot");
+        http.setRequestProperty("fiware-servicepath", "/");
+        http.connect();
+        try(OutputStream os = http.getOutputStream()) {
+            os.write(out);
+        }
+
+    	/*String url = "http://localhost:1026/v2/subscriptions";
+        String urlParameters = "{\n" + 
+    			"  \"description\": \"A subscription to get info about Room1\",\n" + 
+    			"  \"subject\": {\n" + 
+    			"    \"entities\": [\n" + 
+    			"      {\n" + 
+    			"        \"id\": \"Room1\",\n" + 
+    			"        \"type\": \"Room\"\n" + 
+    			"      }\n" + 
+    			"    ],\n" + 
+    			"    \"condition\": {\n" + 
+    			"      \"attrs\": [\n" + 
+    			"        \"pressure\"\n" + 
+    			"      ]\n" + 
+    			"    }\n" + 
+    			"  },\n" + 
+    			"  \"notification\": {\n" + 
+    			"    \"http\": {\n" + 
+    			"      \"url\": \"http://172.18.0.1:"+ port +"/\"\n" + 
+    			"    },\n" + 
+    			"    \"attrs\": [\n" + 
+    			"      \"temperature\"\n" + 
+    			"    ]\n" + 
+    			"  },\n" + 
+    			"  \"expires\": \"2040-01-01T14:00:00.00Z\",\n" + 
+    			"  \"throttling\": 5\n" + 
+    			"}";
+        byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
+
+        try {
+
+            URL myurl = new URL(url);
+            con = (HttpURLConnection) myurl.openConnection();
+
+            con.setDoOutput(true);
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", "Java client");
+            con.setRequestProperty("Content-Type", "application/json");
+
+            try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+                wr.write(postData);
+            }
+
+            StringBuilder content;
+
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()))) {
+
+                String line;
+                content = new StringBuilder();
+
+                while ((line = in.readLine()) != null) {
+                    content.append(line);
+                    content.append(System.lineSeparator());
+                }
+            }
+
+            System.out.println(content.toString());
+
+        } finally {
+            
+            con.disconnect();
+        }*/
+    }
+
+   
+    
+    public InetAddress getSocketAddress() {
+        return this.server.getInetAddress();
+    }
+    
+    public int getPort() {
+        return this.server.getLocalPort();
+    }
+    
+    public static void main(String[] args) throws Exception {
+        MyServerSocket app = new MyServerSocket();
+        System.out.println("\r\nRunning Server: " + 
+                "Host=" + app.getSocketAddress().getHostAddress() + 
+                " Port=" + app.getPort());
+        MyServerSocket.POSTRequest(app.getPort());
+        
+        while(true) {
+        	app.listen();
+        }
+        
+    }
+}

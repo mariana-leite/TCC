@@ -1,0 +1,21 @@
+Para rodar a aplicação corretamente é necessário instalar o Docker e o Docker Compose.
+Após as instalações, no terminal (na pasta do docker-compose):
+
+$ docker pull mongo:3.6
+
+$ docker pull fiware/orion
+
+$ docker pull fiware/iotagent-ul
+
+$ docker-compose --log-level ERROR -p fiware up -d --remove-orphans
+
+
+E então rodar os dois programas, o TCC é o programa principal e o TCC-Sensor é o simulador das lâmpadas.
+
+
+Para reiniciar o docker:
+
+$ docker-compose --log-level ERROR -p fiware down -v --remove-orphans
+
+$ docker-compose --log-level ERROR -p fiware up -d --remove-orphans
+

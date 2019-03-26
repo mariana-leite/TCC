@@ -1,0 +1,27 @@
+1550496020128	Delete element
+1550575884287	Rename local variable 'attributesTime'
+1550575894468	Rename local variable 'deviceTime'
+1550753390362	Rename local variable 'getAllLamps_response'
+1550753416514	Rename local variable 'responseGet_string'
+1550753444683	Rename local variable 'responseFromGET'
+1550753497998	Rename local variable 'attr1'
+1550753525720	Rename local variable 'ultralight1'
+1550753587368	Rename local variable 'getAllLamps'
+1550755140968	Delete element
+1550755169221	Move compilation unit
+1550755200219	Move compilation unit
+1550755232517	Move compilation unit
+1550755265977	Move compilation unit
+1550755294235	Move compilation unit
+1550755324935	Move compilation unit
+1550755355204	Move compilation unit
+1550755620980	Rename type 'Devices'
+1550755651457	Rename type 'Commands'
+1550755679888	Rename type 'Attributes'
+1550755690577	Rename type 'StaticAttributes'
+1550759386467	Delete element
+1550759936832	Rename type 'Http'
+1550760025744	Rename type 'Entitie'
+1550835277070	Rename type 'UltraLightCommands'
+1550845575305	Rename field 'command'
+1550845705430	Rename type 'Command'
